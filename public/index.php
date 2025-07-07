@@ -2,6 +2,6 @@
 
 declare(strict_types = 1);
 
-require_once '../db.php';
+require_once '../app/db.php';
 
 phpinfo();
