@@ -2,6 +2,18 @@
 
 declare(strict_types = 1);
 
-require_once '../app/db.php';
+session_set_cookie_params([
+	'secure' => true,
+	'httponly' => true,
+]);
+session_start();
 
-phpinfo();
+require_once '../app/util.php';
+
+$user = UTIL::getCurrentUser();
+
+if ($user) {
+	$username = $user->getName();
+}
+
+include '../views/header.php';
