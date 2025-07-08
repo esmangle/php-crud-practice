@@ -6,7 +6,7 @@ CREATE TABLE users (
 	id int UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	username varchar(20) CHARACTER SET ascii COLLATE ascii_general_ci UNIQUE NOT NULL,
 	bio varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	password char(60) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+	pass char(60) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
 	creation_date datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
