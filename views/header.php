@@ -1,4 +1,4 @@
-<h3>A Simple Social Media Site</h3>
+<a href="./"><h3>A Simple Social Media Site</h3></a>
 <?php if ($username ?? null): ?>
 	<form action="./logout.php" method="get">
 		You are logged in as
