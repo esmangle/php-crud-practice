@@ -17,3 +17,8 @@ if ($user) {
 }
 
 include '../views/header.php';
+
+if ($user) {
+	include '../app/postform.php';
+	include '../views/postform.php';
+}
