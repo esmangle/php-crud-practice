@@ -20,7 +20,7 @@ if (!$_POST) { // early exit if we have no form data
 	if (isset($_GET['newuser'])) {
 		// redirected from successful signup, autofill the username
 
-		$newuser = urldecode($_GET['newuser']);
+		$newuser = urldecode((string) $_GET['newuser']);
 
 		if (!DB::isUserNameTaken($newuser)) {
 			unset($newuser);
