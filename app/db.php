@@ -290,4 +290,19 @@ class DB {
 
 		return self::getPostFromId($id);
 	}
+
+	public static function deletePost(int $id): bool {
+		trigger_error("fuck");
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'DELETE FROM posts WHERE id = ?'
+			);
+		}
+
+		return $statement->execute([$id]);
+	}
 }

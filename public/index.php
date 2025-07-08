@@ -22,3 +22,5 @@ if ($user) {
 	include '../app/postform.php';
 	include '../views/postform.php';
 }
+
+//placeholder
