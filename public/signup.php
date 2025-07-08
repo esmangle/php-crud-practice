@@ -34,10 +34,8 @@ if ($username instanceof BadSignupDetails) {
 		BadSignupDetails::USERNAME_NOT_ALPHANUM => 'Username may contain only alphanumeric characters',
 		default => 'Invalid username'
 	};
-} else {
-	if (DB::isUserNameTaken($username)) {
-		$signup_errors[] = 'Username is already taken';
-	}
+} elseif (DB::isUserNameTaken($username)) {
+	$signup_errors[] = 'Username is already taken';
 }
 
 if ($password instanceof BadSignupDetails) {
