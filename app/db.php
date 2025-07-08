@@ -6,33 +6,43 @@ require_once '../env.php';
 require_once '../app/user.php';
 
 class DB {
-	public static array $testdb = [
-		[
-			'id' => 0,
-			'name' => 'test',
-			'pass' => 'password',
-		],
-		[
-			'id' => 1,
-			'name' => 'test2',
-			'pass' => 'password2',
-		],
-	];
-
 	private static array $cachedUsers = [];
+	private static array $cachedPosts = [];
 
 	private final function __construct() {}
 
-	public static function isUserNameTaken(string $username): bool {
-		// sql goes here vvv
-		foreach (self::$testdb as $entry) {
-			if ($entry['name'] === $username) {
-				return true;
-			}
-		}
-		// sql goes here ^^^
+	private static function getConn(): PDO {
+		static $conn = null;
 
-		return false;
+		if ($conn) {
+			return $conn;
+		}
+
+		$conn = new PDO(
+			'mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_DATABASE'],
+			$_ENV['DB_USER'], $_ENV['DB_PASS']
+		);
+
+		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+		return $conn;
+	}
+
+	public static function isUserNameTaken(string $username): bool {
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'SELECT 1 FROM users WHERE username = ?'
+			);
+		}
+
+		$statement->execute([$username]);
+
+		return (bool) $statement->fetch();
 	}
 
 	public static function getUserFromId(int $id): ?User {
@@ -42,18 +52,29 @@ class DB {
 			return $user;
 		}
 
-		// sql goes here vvv
-		$data = self::$testdb[$id] ?? null;
+		$conn = self::getConn();
 
-		if ($data === null) {
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'SELECT id, username, bio, creation_date FROM users WHERE id = ?'
+			);
+		}
+
+		$statement->execute([$id]);
+
+		$result = $statement->fetch();
+
+		if (!$result) {
 			return null;
 		}
-		// sql goes here ^^^
 
 		$user = new User(
-			id: $id,
-			name: $data['name'],
-			creation_date: new \DateTimeImmutable()
+			id: (int) $result['id'],
+			name: (string) $result['username'],
+			creation_date: new DateTimeImmutable($result['creation_date']),
+			bio: (string) $result['bio'],
 		);
 
 		self::$cachedUsers[$id] = $user;
@@ -62,15 +83,25 @@ class DB {
 	}
 
 	public static function getUserFromName(string $username): ?User {
-		// sql goes here vvv
-		foreach (self::$testdb as $entry) {
-			if ($entry['name'] === $username) {
-				return self::getUserFromId($entry['id']);
-			}
-		}
-		// sql goes here ^^^
+		$conn = self::getConn();
 
-		return null;
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'SELECT id FROM users WHERE username = ?'
+			);
+		}
+
+		$statement->execute([$username]);
+
+		$result = $statement->fetch();
+
+		if (!$result) {
+			return null;
+		}
+
+		return self::getUserFromId($result['id']);
 	}
 
 	public static function newUser(string $username, string $password): ?User {
@@ -83,17 +114,22 @@ class DB {
 		//	return null;
 		//}
 
-		$hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]);
+		$conn = self::getConn();
 
-		// sql goes here vvv
-		$user = new User(
-			id: 999,
-			name: $username,
-			creation_date: new \DateTimeImmutable()
-		);
-		// sql goes here ^^^
+		static $statement = null;
 
-		return $user;
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'INSERT INTO users (username, pass) VALUES (:username, :pass)'
+			);
+		}
+
+		$statement->execute([
+			':username' => $username,
+			':pass' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]),
+		]);
+
+		return self::getUserFromName($username);
 	}
 
 	public static function loginUser(string $username, string $password): ?User {
@@ -101,24 +137,29 @@ class DB {
 			return null;
 		}
 
-		// sql goes here vvv
-		$id = self::getUserFromName($username)->getId();
+		$conn = self::getConn();
 
-		$data = self::$testdb[$id] ?? null;
+		static $statement = null;
 
-		if ($data === null) {
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'SELECT id, pass FROM users WHERE username = ?'
+			);
+		}
+
+		$statement->execute([$username]);
+
+		$result = $statement->fetch();
+
+		if (!$result) {
 			return null;
 		}
 
-		$hash = $data['pass'];
-		// sql goes here ^^^
-
-		//password_verify($password, $hash)
-		if ($password !== $hash) {
+		if (!password_verify($password, (string) $result['pass'])) {
 			return null;
 		}
 
-		return self::getUserFromID($id);
+		return self::getUserFromID((int) $result['id']);
 	}
 
 	public static function editUserName(User $user, string $username): bool {
