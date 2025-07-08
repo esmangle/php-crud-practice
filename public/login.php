@@ -33,6 +33,8 @@ if (!$_POST) { // early exit if we have no form data
 
 $user = DB::loginUser($_POST['username'] ?? '', $_POST['password'] ?? '');
 
+$login_errors = [];
+
 if ($user) {
 	$_SESSION['userid'] = $user->getId();
 

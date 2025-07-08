@@ -21,6 +21,8 @@ if (!$user) {
 $username = $user->getName();
 $currentBio = $user->getBio();
 
+$useredit_errors = [];
+
 if ($_POST) {
 	$newUserName = UTIL::validateUsername($_POST['username'] ?? '');
 

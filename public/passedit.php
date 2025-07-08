@@ -20,6 +20,8 @@ if (!$user) {
 
 $username = $user->getName();
 
+$passedit_errors = [];
+
 if ($_POST) {
 	$password = UTIL::validatePassword($_POST['password_new'] ?? '', $_POST['password_confirm'] ?? '');
 
