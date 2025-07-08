@@ -2,6 +2,10 @@
 
 declare(strict_types = 1);
 
+session_set_cookie_params([
+	'secure' => true,
+	'httponly' => true,
+]);
 session_start();
 
 require_once '../app/util.php';
