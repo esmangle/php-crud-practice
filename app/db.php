@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 require_once '../env.php';
 require_once '../app/user.php';
+require_once '../app/post.php';
 
 class DB {
 	private static array $cachedUsers = [];
@@ -219,5 +220,74 @@ class DB {
 		]);
 
 		return true;
+	}
+
+	public static function getPostFromId(int $id): ?Post {
+		$post = self::$cachedPosts[$id] ?? null;
+
+		if ($post) {
+			return $post;
+		}
+
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'SELECT id, author_id, parent_id, content, likes, replies, deleted, creation_date FROM posts WHERE id = ?'
+			);
+		}
+
+		$statement->execute([$id]);
+
+		$result = $statement->fetch();
+
+		if (!$result) {
+			return null;
+		}
+
+		$post = new Post(
+			id: (int) $result['id'],
+			author_id: (int) $result['author_id'],
+			parent_id: (int) $result['author_id'],
+			content: (string) $result['content'],
+			likes: (int) $result['likes'],
+			replies: (int) $result['replies'],
+			deleted: (bool) $result['deleted'],
+			creation_date: new DateTimeImmutable($result['creation_date'])
+		);
+
+		self::$cachedPosts[$id] = $post;
+
+		return $post;
+	}
+
+	public static function createPost(
+		User $user, string $postContent, ?Post $postParent = null
+	): ?Post {
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'INSERT INTO posts (author_id, parent_id, content) VALUES (:author_id, :parent_id, :content)'
+			);
+		}
+
+		$success = $statement->execute([
+			':author_id' => $user->getId(),
+			':parent_id' => $postParent?->getId(),
+			':content' => $postContent,
+		]);
+
+		if (!$success) {
+			return null;
+		}
+
+		$id = (int) $conn->lastInsertId();
+
+		return self::getPostFromId($id);
 	}
 }

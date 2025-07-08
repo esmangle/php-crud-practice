@@ -8,6 +8,8 @@ if (!$_POST) {
 
 $postContent = $_POST['postContent'] ?? '';
 
+$post_errors = [];
+
 if (strlen($postContent) > 500) {
 	$postContent = substr($postContent, 0, 500);
 } elseif (strlen($postContent) === 0) {
@@ -18,7 +20,7 @@ if ($post_errors) {
 	return;
 }
 
-$postId = DB::createPost($user, $postContent, $postParent ?? null);
+$postId = DB::createPost($user, $postContent, $postParent ?? null)?->getId();
 
 if ($postId) {
 	header('Location: ./post.php?id=' . urlencode($postId));
