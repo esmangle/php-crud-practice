@@ -7,9 +7,9 @@
 	<p>Confirm password:</p>
 	<input type="password" name="password_confirm" autocomplete="new-password" required/>
 	<p>
-	<?php foreach (($signup_errors ?? []) as $signup_error) { ?>
+	<?php foreach (($signup_errors ?? []) as $signup_error): ?>
 		<div style="color:red"><?= $signup_error ?></div>
-	<?php } ?>
+	<?php endforeach; ?>
 	</p>
 	<input type="submit" value="Create new account"/>
 </form>

@@ -1,22 +1,22 @@
 <h2>Log in</h2>
 <form action="./login.php" method="post">
-	<?php if ($newuser ?? null) { ?>
+	<?php if ($newuser ?? null): ?>
 		<p style="color:green">
 			Successfully created new account, you may now log in:
 		</p>
-	<?php } ?>
+	<?php endif; ?>
 	<p>Username:</p>
 	<input type="text" name="username" autocomplete="username" required
-		<?php if ($newuser ?? null) { ?>
+		<?php if ($newuser ?? null): ?>
 			value="<?= htmlspecialchars($newuser) ?>"
-		<?php } ?>
+		<?php endif; ?>
 	/>
 	<p>Password:</p>
 	<input type="password" name="password" autocomplete="password" required/>
 	<p>
-	<?php foreach (($login_errors ?? []) as $login_errors) { ?>
+	<?php foreach (($login_errors ?? []) as $login_errors): ?>
 		<div style="color:red"><?= $login_errors ?></div>
-	<?php } ?>
+	<?php endforeach; ?>
 	</p>
 	<input type="submit" value="Log in"/>
 </form>
