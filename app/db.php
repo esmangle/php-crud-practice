@@ -120,4 +120,14 @@ class DB {
 
 		return self::getUserFromID($id);
 	}
+
+	public static function editUserName(User $user, string $username): bool {
+
+		return true;
+	}
+
+	public static function editBio(User $user, string $bio): bool {
+
+		return true;
+	}
 }
