@@ -6,7 +6,7 @@
 <?php endif; ?>
 <p>
 	Account created:
-	<?= htmlspecialchars($thisUserCreationDate->format('Y-m-d H:i:s')) ?>
+	<?= htmlspecialchars($thisUserCreationDate) ?>
 </p>
 <?php if ($thisUserIsLoggedIn): ?>
 	<form action="./useredit.php" method="get">

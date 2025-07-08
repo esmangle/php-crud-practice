@@ -36,7 +36,7 @@ if (!$thisUser) {
 
 $thisUserName = $thisUser->getName();
 $thisUserBio = $thisUser->getBio();
-$thisUserCreationDate = $thisUser->getCreationDate();
+$thisUserCreationDate = UTIL::dateToString($thisUser->getCreationDate());
 $thisUserIsLoggedIn = $user?->isEqual($thisUser);
 
 include '../views/user.php';

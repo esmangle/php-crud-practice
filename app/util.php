@@ -29,6 +29,11 @@ class UTIL {
 		return $user;
 	}
 
+	public static function dateToString(DateTimeImmutable $date): string {
+		// todo: take timezones into account or return strings like "3 minutes ago" or "6 months ago"
+		return $date->format('g:i A - j F Y');
+	}
+
 	public static function validateUsername(
 		string $username
 	): string|BadSignupDetails
