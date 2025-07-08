@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-if (empty($_POST)) { // early exit if we have no form data
+if (!$_POST) { // early exit if we have no form data
 	include '../views/signup.php';
 	return;
 }
@@ -38,7 +38,7 @@ if ($password instanceof BadSignupDetails) {
 	};
 }
 
-if (empty($signup_errors)) { // no errors, create new account
+if (!$signup_errors) { // no errors, create new account
 	DB::newUser($username, $password);
 
 	header('Location: ./login.php?newuser=' . urlencode($username));
