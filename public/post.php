@@ -52,6 +52,6 @@ if (!$thisPost) {
 	return;
 }
 
-$canDeletePost = $thisPostAuthorId === $user->getId();
+$canDeletePost = $user ? $thisPostAuthorId === $user->getId() : false;
 
 include '../views/postpage.php';
