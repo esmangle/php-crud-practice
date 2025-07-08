@@ -1,9 +1,13 @@
 <?php
 
-$thisPost = null;
+$thisPost ??= null;
+$thisPostId ??= null;
 
 if ($thisPostId !== null) {
-	$thisPost = DB::getPostFromId((int) $thisPostId);
+	$thisPost ??= DB::getPostFromId((int) $thisPostId);
+}
+if ($thisPost !== null) {
+	$thisPostId = $thisPost->getId();
 }
 
 if (!$thisPost) {

@@ -250,7 +250,7 @@ class DB {
 		$post = new Post(
 			id: (int) $result['id'],
 			author_id: (int) $result['author_id'],
-			parent_id: (int) $result['author_id'],
+			parent_id: (int) $result['parent_id'],
 			content: (string) $result['content'],
 			likes: (int) $result['likes'],
 			replies: (int) $result['replies'],
@@ -304,5 +304,50 @@ class DB {
 		}
 
 		return $statement->execute([$id]);
+	}
+
+	public static function listPosts(?int $parentId = null): array {
+		$output = [];
+
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'SELECT id, author_id, parent_id, content, likes, replies, deleted, creation_date'
+				//. ' FROM posts WHERE parent_id = ?'
+				. ' FROM posts'
+				. ' ORDER BY creation_date DESC'
+			);
+		}
+
+		//$statement->execute([$parentId]);
+		$statement->execute();
+
+		$results = $statement->fetchAll();
+
+		if (!$results) {
+			return $output;
+		}
+
+		foreach ($results as $result) {
+			$post = new Post(
+				id: (int) $result['id'],
+				author_id: (int) $result['author_id'],
+				parent_id: (int) $result['parent_id'],
+				content: (string) $result['content'],
+				likes: (int) $result['likes'],
+				replies: (int) $result['replies'],
+				deleted: (bool) $result['deleted'],
+				creation_date: new DateTimeImmutable($result['creation_date'])
+			);
+
+			self::$cachedPosts[$post->getId()] = $post;
+
+			$output[] = $post;
+		}
+
+		return $output;
 	}
 }

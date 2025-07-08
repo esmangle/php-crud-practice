@@ -23,4 +23,10 @@ if ($user) {
 	include '../views/postform.php';
 }
 
-//placeholder
+//placeholder stuff below
+require_once '../app/db.php';
+foreach (DB::listPosts() as $thisPost) {
+	include '../app/postview.php';
+	include '../views/postview.php';
+	echo '<hr/>';
+}
