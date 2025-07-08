@@ -163,11 +163,60 @@ class DB {
 	}
 
 	public static function editUserName(User $user, string $username): bool {
+		if (self::isUserNameTaken($username)) {
+			return false;
+		}
+
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'UPDATE users SET username = :username WHERE id = :id'
+			);
+		}
+
+		return $statement->execute([
+			':id' => $user->getId(),
+			':username' => $username,
+		]);
+	}
+
+	public static function editBio(User $user, string $bio): bool {
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'UPDATE users SET bio = :bio WHERE id = :id'
+			);
+		}
+
+		return $statement->execute([
+			':id' => $user->getId(),
+			':bio' => $bio,
+		]);
 
 		return true;
 	}
 
-	public static function editBio(User $user, string $bio): bool {
+	public static function editPassword(User $user, string $password): bool {
+		$conn = self::getConn();
+
+		static $statement = null;
+
+		if (!$statement) {
+			$statement = $conn->prepare(
+				'UPDATE users SET pass = :pass WHERE id = :id'
+			);
+		}
+
+		return $statement->execute([
+			':id' => $user->getId(),
+			':pass' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 11]),
+		]);
 
 		return true;
 	}

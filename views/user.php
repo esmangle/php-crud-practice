@@ -12,5 +12,8 @@
 	<form action="./useredit.php" method="get">
 		<input type="submit" value="Edit user details"/>
 	</form>
+	<form action="./passedit.php" method="get">
+		<input type="submit" value="Change password"/>
+	</form>
 <?php endif; ?>
 <hr/>
