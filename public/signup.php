@@ -2,13 +2,20 @@
 
 declare(strict_types = 1);
 
+session_start();
+
+require_once '../app/util.php';
+require_once '../app/db.php';
+
+if (UTIL::getCurrentUser() !== null) { // already logged in
+	header('Location: ./');
+	return;
+}
+
 if (!$_POST) { // early exit if we have no form data
 	include '../views/signup.php';
 	return;
 }
-
-require_once '../app/util.php';
-require_once '../app/db.php';
 
 $username = UTIL::validateUsername($_POST['username'] ?? '');
 
@@ -24,7 +31,7 @@ if ($username instanceof BadSignupDetails) {
 		default => 'Invalid username'
 	};
 } else {
-	if (DB::isUserExisting($username)) {
+	if (DB::isUserNameTaken($username)) {
 		$signup_errors[] = 'Username is already taken';
 	}
 }
@@ -39,11 +46,14 @@ if ($password instanceof BadSignupDetails) {
 }
 
 if (!$signup_errors) { // no errors, create new account
-	DB::newUser($username, $password);
+	$user = DB::newUser($username, $password);
 
-	header('Location: ./login.php?newuser=' . urlencode($username));
+	if ($user instanceof User) {
+		header('Location: ./login.php?newuser=' . urlencode($user->getName()));
+		return;
+	}
 
-	return;
+	$signup_errors[] = 'Sign up unsuccessful, please try again later';
 }
 
 include '../views/signup.php';

@@ -2,6 +2,8 @@
 
 declare(strict_types = 1);
 
+require_once '../app/db.php';
+
 enum BadSignupDetails {
 	case USERNAME_TOO_SHORT;
 	case USERNAME_TOO_LONG;
@@ -12,9 +14,21 @@ enum BadSignupDetails {
 }
 
 class UTIL {
-	/**
-	 *
-	 */
+	public static function getCurrentUser(): ?User {
+		if (!isset($_SESSION['userid'])) {
+			return null;
+		}
+
+		$user = DB::getUserFromId($_SESSION['userid']);
+
+		if ($user === null) {
+			unset($_SESSION['userid']);
+			return null;
+		}
+
+		return $user;
+	}
+
 	public static function validateUsername(
 		string $username
 	): string|BadSignupDetails
@@ -34,9 +48,6 @@ class UTIL {
 		return $username;
 	}
 
-	/**
-	 *
-	 */
 	public static function validatePassword(
 		string $password,
 		string $password_confirm

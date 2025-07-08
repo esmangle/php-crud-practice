@@ -21,7 +21,7 @@ class DB {
 
 	private final function __construct() {}
 
-	public static function isUserExisting(string $username): bool {
+	public static function isUserNameTaken(string $username): bool {
 		foreach (self::$testdb as $entry) {
 			if ($entry['name'] === $username) {
 				return true;
@@ -55,12 +55,28 @@ class DB {
 		return $user;
 	}
 
-	public static function newUser(string $username, string $password): ?User {
+	public static function getUserFromName(int $username): ?User {
+		foreach (self::$testdb as $entry) {
+			if ($entry['name'] === $username) {
+				return self::getUserFromId($entry['id']);
+			}
+		}
+
 		return null;
 	}
 
+	public static function newUser(string $username, string $password): ?User {
+		$user = new User(
+			id: 999,
+			name: $username,
+			creation_date: new \DateTimeImmutable()
+		);
+
+		return $user;
+	}
+
 	public static function loginUser(string $username, string $password): ?User {
-		if (!self::isUserExisting($username)) {
+		if (!self::isUserNameTaken($username)) {
 			return null;
 		}
 
